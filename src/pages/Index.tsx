@@ -2,18 +2,44 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
+import BalanceDisplay from "@/components/BalanceDisplay";
 import OpenCaseModal from "@/components/OpenCaseModal";
+import NotEnoughBalanceModal from "@/components/NotEnoughBalanceModal";
 import { Case } from "@/types";
 
 const Index = () => {
-  // Состояние для управления модальным окном открытия кейса
-  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Состояние для баланса пользователя
+  const [balance, setBalance] = useState<number>(1000);
 
-  // Функция для открытия модального окна с выбранным кейсом
-  const openCase = (caseItem: Case) => {
+  // Состояние для управления модальными окнами
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [showCaseModal, setShowCaseModal] = useState<boolean>(false);
+  const [showBalanceModal, setShowBalanceModal] = useState<boolean>(false);
+
+  // Функция для пополнения баланса
+  const handleAddBalance = (amount: number) => {
+    setBalance((prev) => prev + amount);
+  };
+
+  // Функция для списания средств
+  const handleSpendBalance = (amount: number): boolean => {
+    if (balance >= amount) {
+      setBalance((prev) => prev - amount);
+      return true;
+    }
+    return false;
+  };
+
+  // Функция для открытия кейса
+  const handleOpenCase = (caseItem: Case) => {
     setSelectedCase(caseItem);
-    setIsModalOpen(true);
+
+    if (balance >= caseItem.price) {
+      setShowCaseModal(true);
+      handleSpendBalance(caseItem.price);
+    } else {
+      setShowBalanceModal(true);
+    }
   };
 
   // Данные о кейсах
@@ -159,10 +185,10 @@ const Index = () => {
               </ul>
             </nav>
             <div className="flex items-center gap-4">
-              <div className="hidden items-center gap-2 rounded-lg bg-purple-500/20 px-3 py-1.5 md:flex">
-                <Icon name="Coins" className="h-5 w-5 text-yellow-400" />
-                <span className="font-bold">0 ₽</span>
-              </div>
+              <BalanceDisplay
+                balance={balance}
+                onAddBalance={handleAddBalance}
+              />
               <Button className="bg-purple-600 hover:bg-purple-700">
                 <Icon name="LogIn" className="mr-2 h-4 w-4" />
                 Войти
@@ -209,7 +235,7 @@ const Index = () => {
                     <Button
                       size="sm"
                       className="bg-purple-600 hover:bg-purple-700"
-                      onClick={() => openCase(caseItem)}
+                      onClick={() => handleOpenCase(caseItem)}
                     >
                       Открыть
                     </Button>
@@ -220,6 +246,27 @@ const Index = () => {
           ))}
         </div>
       </main>
+
+      {/* Модальные окна */}
+      {selectedCase && (
+        <>
+          <OpenCaseModal
+            isOpen={showCaseModal}
+            onClose={() => setShowCaseModal(false)}
+            caseName={selectedCase.name}
+            caseImage={selectedCase.image}
+            rarity={selectedCase.rarity}
+          />
+
+          <NotEnoughBalanceModal
+            isOpen={showBalanceModal}
+            onClose={() => setShowBalanceModal(false)}
+            requiredAmount={selectedCase.price}
+            currentBalance={balance}
+            onAddBalance={handleAddBalance}
+          />
+        </>
+      )}
 
       {/* Футер */}
       <footer className="border-t border-gray-800 bg-[#0F131C] py-6">
@@ -259,17 +306,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-
-      {/* Модальное окно для открытия кейса */}
-      {selectedCase && (
-        <OpenCaseModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          caseName={selectedCase.name}
-          caseImage={selectedCase.image}
-          rarity={selectedCase.rarity}
-        />
-      )}
     </div>
   );
 };
