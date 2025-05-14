@@ -2,43 +2,38 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
-import BalanceDisplay from "@/components/BalanceDisplay";
 import OpenCaseModal from "@/components/OpenCaseModal";
+import BalanceDisplay from "@/components/BalanceDisplay";
 import NotEnoughBalanceModal from "@/components/NotEnoughBalanceModal";
 import { Case } from "@/types";
 
 const Index = () => {
-  // Состояние для баланса пользователя
+  // Баланс пользователя
   const [balance, setBalance] = useState<number>(1000);
 
-  // Состояние для управления модальными окнами
+  // Состояние модального окна открытия кейса
+  const [openCaseModalOpen, setOpenCaseModalOpen] = useState<boolean>(false);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
-  const [showCaseModal, setShowCaseModal] = useState<boolean>(false);
-  const [showBalanceModal, setShowBalanceModal] = useState<boolean>(false);
 
-  // Функция для пополнения баланса
+  // Состояние модального окна недостаточного баланса
+  const [notEnoughBalanceModalOpen, setNotEnoughBalanceModalOpen] =
+    useState<boolean>(false);
+  const [requiredAmount, setRequiredAmount] = useState<number>(0);
+
+  // Обработчик пополнения баланса
   const handleAddBalance = (amount: number) => {
     setBalance((prev) => prev + amount);
   };
 
-  // Функция для списания средств
-  const handleSpendBalance = (amount: number): boolean => {
-    if (balance >= amount) {
-      setBalance((prev) => prev - amount);
-      return true;
-    }
-    return false;
-  };
-
-  // Функция для открытия кейса
+  // Обработчик открытия кейса
   const handleOpenCase = (caseItem: Case) => {
-    setSelectedCase(caseItem);
-
     if (balance >= caseItem.price) {
-      setShowCaseModal(true);
-      handleSpendBalance(caseItem.price);
+      setBalance((prev) => prev - caseItem.price);
+      setSelectedCase(caseItem);
+      setOpenCaseModalOpen(true);
     } else {
-      setShowBalanceModal(true);
+      setRequiredAmount(caseItem.price);
+      setNotEnoughBalanceModalOpen(true);
     }
   };
 
@@ -247,27 +242,6 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Модальные окна */}
-      {selectedCase && (
-        <>
-          <OpenCaseModal
-            isOpen={showCaseModal}
-            onClose={() => setShowCaseModal(false)}
-            caseName={selectedCase.name}
-            caseImage={selectedCase.image}
-            rarity={selectedCase.rarity}
-          />
-
-          <NotEnoughBalanceModal
-            isOpen={showBalanceModal}
-            onClose={() => setShowBalanceModal(false)}
-            requiredAmount={selectedCase.price}
-            currentBalance={balance}
-            onAddBalance={handleAddBalance}
-          />
-        </>
-      )}
-
       {/* Футер */}
       <footer className="border-t border-gray-800 bg-[#0F131C] py-6">
         <div className="container mx-auto px-4">
@@ -306,6 +280,25 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Модальные окна */}
+      {selectedCase && (
+        <OpenCaseModal
+          isOpen={openCaseModalOpen}
+          onClose={() => setOpenCaseModalOpen(false)}
+          caseName={selectedCase.name}
+          caseImage={selectedCase.image}
+          rarity={selectedCase.rarity}
+        />
+      )}
+
+      <NotEnoughBalanceModal
+        isOpen={notEnoughBalanceModalOpen}
+        onClose={() => setNotEnoughBalanceModalOpen(false)}
+        requiredAmount={requiredAmount}
+        currentBalance={balance}
+        onAddBalance={handleAddBalance}
+      />
     </div>
   );
 };
