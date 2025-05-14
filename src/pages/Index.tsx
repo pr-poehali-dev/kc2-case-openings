@@ -1,89 +1,101 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
-
-// Типы кейсов
-type Case = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
-};
+import OpenCaseModal from "@/components/OpenCaseModal";
+import { Case } from "@/types";
 
 const Index = () => {
+  // Состояние для управления модальным окном открытия кейса
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Функция для открытия модального окна с выбранным кейсом
+  const openCase = (caseItem: Case) => {
+    setSelectedCase(caseItem);
+    setIsModalOpen(true);
+  };
+
   // Данные о кейсах
   const cases: Case[] = [
     {
       id: 1,
       name: "Стандартный кейс",
       price: 199,
-      image: "https://images.unsplash.com/photo-1605792657660-596af9009e82?q=80&w=2202&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1605792657660-596af9009e82?q=80&w=2202&auto=format&fit=crop",
       rarity: "common",
     },
     {
       id: 2,
       name: "Кейс с AK-47",
       price: 499,
-      image: "https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=2070&auto=format&fit=crop",
       rarity: "rare",
     },
     {
       id: 3,
       name: "Премиум кейс",
       price: 799,
-      image: "https://images.unsplash.com/photo-1587655957037-78defa2fb96c?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1587655957037-78defa2fb96c?q=80&w=2070&auto=format&fit=crop",
       rarity: "epic",
     },
     {
       id: 4,
       name: "Элитный снайпер",
       price: 899,
-      image: "https://images.unsplash.com/photo-1613591741539-fabb34e6b283?q=80&w=1974&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1613591741539-fabb34e6b283?q=80&w=1974&auto=format&fit=crop",
       rarity: "rare",
     },
     {
       id: 5,
       name: "Легендарный дроп",
       price: 1299,
-      image: "https://images.unsplash.com/photo-1621975883759-1e027ca54ae3?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1621975883759-1e027ca54ae3?q=80&w=2070&auto=format&fit=crop",
       rarity: "legendary",
     },
     {
       id: 6,
       name: "Ножевой кейс",
       price: 1599,
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1884&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1884&auto=format&fit=crop",
       rarity: "legendary",
     },
     {
       id: 7,
       name: "Тактический набор",
       price: 699,
-      image: "https://images.unsplash.com/photo-1548269957-ae9d3aebc407?q=80&w=2028&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1548269957-ae9d3aebc407?q=80&w=2028&auto=format&fit=crop",
       rarity: "epic",
     },
     {
       id: 8,
       name: "Военный кейс",
       price: 599,
-      image: "https://images.unsplash.com/photo-1547700055-b61cacebece9?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1547700055-b61cacebece9?q=80&w=2070&auto=format&fit=crop",
       rarity: "rare",
     },
     {
       id: 9,
       name: "Штурмовой кейс",
       price: 399,
-      image: "https://images.unsplash.com/photo-1555661530-68c8e98dbce3?q=80&w=2073&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1555661530-68c8e98dbce3?q=80&w=2073&auto=format&fit=crop",
       rarity: "common",
     },
     {
       id: 10,
       name: "Золотая коллекция",
       price: 999,
-      image: "https://images.unsplash.com/photo-1624454002302-89e325a0cf8a?q=80&w=1974&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1624454002302-89e325a0cf8a?q=80&w=1974&auto=format&fit=crop",
       rarity: "epic",
     },
   ];
@@ -128,14 +140,22 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="text-2xl font-bold text-purple-400">KC2DROP</div>
-              <span className="rounded-full bg-green-500 px-2 py-0.5 text-xs">BETA</span>
+              <span className="rounded-full bg-green-500 px-2 py-0.5 text-xs">
+                BETA
+              </span>
             </div>
             <nav className="hidden md:block">
               <ul className="flex space-x-6">
                 <li className="font-medium">Главная</li>
-                <li className="font-medium text-gray-400 transition-colors hover:text-white">Все кейсы</li>
-                <li className="font-medium text-gray-400 transition-colors hover:text-white">Топ дропы</li>
-                <li className="font-medium text-gray-400 transition-colors hover:text-white">FAQ</li>
+                <li className="font-medium text-gray-400 transition-colors hover:text-white">
+                  Все кейсы
+                </li>
+                <li className="font-medium text-gray-400 transition-colors hover:text-white">
+                  Топ дропы
+                </li>
+                <li className="font-medium text-gray-400 transition-colors hover:text-white">
+                  FAQ
+                </li>
               </ul>
             </nav>
             <div className="flex items-center gap-4">
@@ -157,8 +177,8 @@ const Index = () => {
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-4xl font-bold">Открывай кейсы KC2</h1>
           <p className="mx-auto max-w-2xl text-gray-400">
-            Испытай удачу и получи редкие скины из игры KC2. Выбирай из множества кейсов
-            с разными шансами на выигрыш легендарных предметов!
+            Испытай удачу и получи редкие скины из игры KC2. Выбирай из
+            множества кейсов с разными шансами на выигрыш легендарных предметов!
           </p>
         </div>
 
@@ -168,7 +188,7 @@ const Index = () => {
             <div key={caseItem.id} className="group">
               <Card
                 className={`border-2 ${getRarityColor(
-                  caseItem.rarity
+                  caseItem.rarity,
                 )} overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_15px_0] hover:shadow-purple-500/50`}
               >
                 <CardContent className="overflow-hidden p-3">
@@ -183,8 +203,14 @@ const Index = () => {
                   </div>
                   <div className="mb-2 text-lg font-bold">{caseItem.name}</div>
                   <div className="flex items-center justify-between">
-                    <div className="font-bold text-yellow-400">{caseItem.price} ₽</div>
-                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                    <div className="font-bold text-yellow-400">
+                      {caseItem.price} ₽
+                    </div>
+                    <Button
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700"
+                      onClick={() => openCase(caseItem)}
+                    >
                       Открыть
                     </Button>
                   </div>
@@ -200,7 +226,9 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="text-center md:text-left">
-              <div className="mb-1 text-xl font-bold text-purple-400">KC2DROP</div>
+              <div className="mb-1 text-xl font-bold text-purple-400">
+                KC2DROP
+              </div>
               <p className="text-sm text-gray-400">
                 © 2025 KC2DROP. Все права защищены.
               </p>
@@ -210,15 +238,38 @@ const Index = () => {
                 Мы в социальных сетях:
               </div>
               <div className="flex gap-3">
-                <Icon name="Instagram" className="h-5 w-5 text-gray-400 hover:text-white" />
-                <Icon name="Twitter" className="h-5 w-5 text-gray-400 hover:text-white" />
-                <Icon name="Youtube" className="h-5 w-5 text-gray-400 hover:text-white" />
-                <Icon name="Twitch" className="h-5 w-5 text-gray-400 hover:text-white" />
+                <Icon
+                  name="Instagram"
+                  className="h-5 w-5 text-gray-400 hover:text-white"
+                />
+                <Icon
+                  name="Twitter"
+                  className="h-5 w-5 text-gray-400 hover:text-white"
+                />
+                <Icon
+                  name="Youtube"
+                  className="h-5 w-5 text-gray-400 hover:text-white"
+                />
+                <Icon
+                  name="Twitch"
+                  className="h-5 w-5 text-gray-400 hover:text-white"
+                />
               </div>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Модальное окно для открытия кейса */}
+      {selectedCase && (
+        <OpenCaseModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          caseName={selectedCase.name}
+          caseImage={selectedCase.image}
+          rarity={selectedCase.rarity}
+        />
+      )}
     </div>
   );
 };
